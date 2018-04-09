@@ -2,7 +2,7 @@ using System;
 using KpiView.Api.Controllers;
 using Xunit;
 
-namespace KpiView.Api.Test {
+namespace KpiView.Api.Test.Unit {
     public class KpisControllerShould {
         [Fact]
         public void RespondToGetRequest () {
