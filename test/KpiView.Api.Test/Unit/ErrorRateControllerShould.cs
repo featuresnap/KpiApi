@@ -12,7 +12,7 @@ namespace KpiView.Api.Test.Unit
         public ErrorRateControllerShould()
         {
             var options = new DbContextOptionsBuilder<KpiDbContext>()
-                .UseInMemoryDatabase("kpi").Options;
+                .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
             context = new KpiDbContext(options);
             controller = new ErrorRateController(context);
 
