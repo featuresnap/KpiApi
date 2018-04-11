@@ -30,6 +30,8 @@ namespace KpiView.Api.Test.Unit
             Assert.Equal(1.0M, result.Rate);
         }
 
+        
+
         [Fact]
         public void ReturnZeroWhenOnlyOneSuccessRecordExists()
         {
@@ -39,8 +41,15 @@ namespace KpiView.Api.Test.Unit
 
             var result = controller.Get();
 
+            Assert.Equal(0.0M, result.Rate);    
+        }
+
+        [Fact]
+        public void ReturnZeroWhenNoRecordsExist()
+        {
+            var result = controller.Get();
+
             Assert.Equal(0.0M, result.Rate);
-            
         }
     }
 }
