@@ -18,8 +18,8 @@ namespace KpiView.Api
 
         public ErrorRate Get()
         {
-            var allCalls = _dbContext.CallOutcomes.Count();
-            var errorCalls = _dbContext.CallOutcomes.Count(co => co.IsError);
+            decimal allCalls = _dbContext.CallOutcomes.Count();
+            decimal errorCalls = _dbContext.CallOutcomes.Count(co => co.IsError);
             var result = new ErrorRate();
             if (allCalls != 0)
             {
