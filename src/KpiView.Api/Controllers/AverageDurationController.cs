@@ -19,7 +19,15 @@ namespace KpiView.Api
 
         public AverageDurationResponse Get()
         {
-            return new AverageDurationResponse { AverageDurationMilliseconds = ComputeAverageDuration() };
+            try
+            {
+                return new AverageDurationResponse { AverageDurationMilliseconds = ComputeAverageDuration() };
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to compute average duration");
+                throw;
+            }
         }
 
         private decimal? ComputeAverageDuration()

@@ -92,6 +92,18 @@ namespace KpiView.Api.Test
             _logger.Verify(l => l.LogWarning(It.IsAny<string>()));
         }
 
+        [Fact]
+        public void LogErrorWhenDataRetrievalFails()
+        {
+            var dbContext = new Mock<KpiDbContext>();
+            dbContext.SetupGet(c=>c.CallDurations).Throws(new TimeoutException());
+            var controller = new AverageDurationController(dbContext.Object, _logger.Object);
+
+            Assert.ThrowsAny<Exception>(() => controller.Get());
+
+            _logger.Verify(l=> l.LogError(It.IsAny<TimeoutException>(), It.IsAny<string>()));
+        }
+
         private void ArrangeCall(Action<CallDuration> configuration)
         {
             var callDuration = new CallDuration
