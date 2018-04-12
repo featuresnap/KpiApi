@@ -26,11 +26,18 @@ namespace KpiView.Api.Test
         }
 
         [Fact]
-        public void ReturnCorrectAverage()
+        public void ReturnCorrectAverageForSingleRecord()
         {
             ArrangeCallTaking(TimeSpan.FromSeconds(1.0));
             var result = _controller.Get();
             Assert.Equal(1000M, result.AverageDurationMilliseconds);
+        }
+
+        [Fact]
+        public void ReturnNullDurationWhenNoRecordsFound()
+        {
+            var result =_controller.Get();
+            Assert.Null(result.AverageDurationMilliseconds);
         }
 
         private void ArrangeCallTaking(TimeSpan duration, Action<CallDuration> extraConfiguration = null)
@@ -44,7 +51,7 @@ namespace KpiView.Api.Test
                 EndTime = DateTime.Now.AddMinutes(-1.0),
                 StartTime = startTime
             };
-            if(extraConfiguration != null) {extraConfiguration(callDuration);}
+            if (extraConfiguration != null) { extraConfiguration(callDuration); }
             _dbContext.CallDurations.Add(callDuration);
             _dbContext.SaveChanges();
         }
