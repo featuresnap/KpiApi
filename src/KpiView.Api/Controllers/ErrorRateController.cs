@@ -26,12 +26,20 @@ namespace KpiView.Api
             return response;
         }
 
-        private (int, int) CountTotalAndErrorRecords()
+        private(int, int) CountTotalAndErrorRecords()
         {
-            var oldestTimestamp = DateTime.Now.AddHours(-1.0);
-            var allCalls = _dbContext.CallOutcomes.Count(c=>c.Timestamp >= oldestTimestamp);
-            var errorCalls = _dbContext.CallOutcomes.Count(c=>c.Timestamp >= oldestTimestamp && c.IsError);
-            return (allCalls, errorCalls);
+            try
+            {
+                var oldestTimestamp = DateTime.Now.AddHours(-1.0);
+                var allCalls = _dbContext.CallOutcomes.Count(c => c.Timestamp >= oldestTimestamp);
+                var errorCalls = _dbContext.CallOutcomes.Count(c => c.Timestamp >= oldestTimestamp && c.IsError);
+                return (allCalls, errorCalls);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to retrieve record counts for error rate computation");
+                throw;
+            }
         }
 
         private decimal CalculateErrorRate(int allCalls, int errorCalls)
@@ -41,7 +49,7 @@ namespace KpiView.Api
                 _logger.LogWarning("No calls available for error rate computation");
                 return 0.0M;
             }
-            return (decimal)errorCalls / (decimal)allCalls;
+            return (decimal) errorCalls / (decimal) allCalls;
         }
 
         private string GetColorCondition(decimal errorRate)

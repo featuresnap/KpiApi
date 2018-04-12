@@ -85,6 +85,16 @@ namespace KpiView.Api.Test.Unit
             _logger.Verify(l => l.LogWarning("No calls available for error rate computation"));
         }
 
+        [Fact]
+        public void LogErrorWhenRetrievingData()
+        {
+            var context = new Mock<KpiDbContext>();
+            context.SetupGet(c => c.CallOutcomes).Throws(new TimeoutException());
+            var controller = new ErrorRateController(context.Object, _logger.Object);
+            Assert.ThrowsAny<Exception>(() => controller.Get());
+            _logger.Verify(l => l.LogError(It.IsAny<TimeoutException>(), It.IsAny<string>()));
+        }
+
         private void ArrangeError(Action<CallOutcome> overrides = null)
         {
             ArrangeRecord(true, overrides);
