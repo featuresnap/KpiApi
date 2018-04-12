@@ -34,11 +34,20 @@ namespace KpiView.Api.Test
         }
 
         [Fact]
+        public void ReturnCorrectAverageForTwoRecordsOfSameDuration(){
+            ArrangeCallTaking(TimeSpan.FromSeconds(1.0));
+            ArrangeCallTaking(TimeSpan.FromSeconds(1.0));
+            var result = _controller.Get();
+            Assert.Equal(1000M, result.AverageDurationMilliseconds);
+        }
+
+        [Fact]
         public void ReturnNullDurationWhenNoRecordsFound()
         {
             var result =_controller.Get();
             Assert.Null(result.AverageDurationMilliseconds);
         }
+
 
         private void ArrangeCallTaking(TimeSpan duration, Action<CallDuration> extraConfiguration = null)
         {
