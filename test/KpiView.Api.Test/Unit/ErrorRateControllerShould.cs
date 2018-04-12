@@ -105,10 +105,10 @@ namespace KpiView.Api.Test.Unit
             ArrangeRecord(false, overrides);
         }
 
-        private void ArrangeRecord(bool isError, Action<CallOutcome> overrides = null)
+        private void ArrangeRecord(bool isError, Action<CallOutcome> extraConfiguration = null)
         {
             var callOutcome = new CallOutcome { Id = _nextId++, EndTimestamp = DateTime.Now.AddSeconds(-1.0), IsError = isError };
-            if (overrides != null) { overrides(callOutcome); }
+            if (extraConfiguration != null) { extraConfiguration(callOutcome); }
             _context.CallOutcomes.Add(callOutcome);
             _context.SaveChanges();
         }
