@@ -11,7 +11,7 @@ namespace KpiView.Api
         private readonly KpiDbContext _dbContext;
         private readonly ILoggingAdapter _logger;
 
-        public AverageDurationController(KpiDbContext dbContext, ILoggingAdapter logger)
+        public AverageDurationController(KpiDbContext dbContext, ILoggingAdapter<AverageDurationController> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
