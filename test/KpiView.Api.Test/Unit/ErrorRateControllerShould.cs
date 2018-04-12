@@ -15,11 +15,11 @@ namespace KpiView.Api.Test.Unit
 
         public ErrorRateControllerShould()
         {
-            var options = new DbContextOptionsBuilder<KpiDbContext>()
+            var dbOptions = new DbContextOptionsBuilder<KpiDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+            _context = new KpiDbContext(dbOptions);
 
             _logger = new Mock<ILoggingAdapter<ErrorRateController>>();
-            _context = new KpiDbContext(options);
             _controller = new ErrorRateController(_context, _logger.Object);
 
         }

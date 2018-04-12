@@ -8,8 +8,8 @@ namespace KpiView.Api
     [Route("api/kpis/[controller]")]
     public class ErrorRateController : Controller
     {
-        private KpiDbContext _dbContext;
-        private ILoggingAdapter _logger;
+        private readonly KpiDbContext _dbContext;
+        private readonly ILoggingAdapter _logger;
 
         public ErrorRateController(KpiDbContext dbContext, ILoggingAdapter<ErrorRateController> logger)
         {
