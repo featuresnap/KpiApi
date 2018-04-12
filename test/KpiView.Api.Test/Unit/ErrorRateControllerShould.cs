@@ -45,6 +45,17 @@ namespace KpiView.Api.Test.Unit
             Assert.Equal(expectedErrorRate, result.Rate);
         }
 
+        [Fact]
+        public void NotConsiderRecordsOlderThanOneHour()
+        {
+            ArrangeError(record => record.Timestamp = DateTime.Now.AddMinutes(-61.0));
+
+            var result = _controller.Get();
+
+            Assert.Equal(0.0M, result.Rate);
+            Assert.Equal(ColorCondition.GREEN, result.ColorCondition);
+        }
+
         [Theory]
         [InlineData(0, 0, ColorCondition.GREEN)]
         [InlineData(99, 1, ColorCondition.GREEN)]
@@ -66,7 +77,6 @@ namespace KpiView.Api.Test.Unit
 
             Assert.Equal(expectedColor, result.ColorCondition);
         }
-
 
         [Fact]
         public void LogWarningWhenNoRecordsExist()
@@ -92,6 +102,5 @@ namespace KpiView.Api.Test.Unit
             _context.CallOutcomes.Add(callOutcome);
             _context.SaveChanges();
         }
-
     }
 }

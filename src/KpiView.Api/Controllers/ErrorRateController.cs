@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using KpiView.Api.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -18,12 +19,19 @@ namespace KpiView.Api
 
         public ErrorRateResponse Get()
         {
-            var allCalls = _dbContext.CallOutcomes.Count();
-            var errorCalls = _dbContext.CallOutcomes.Count(co => co.IsError);
+            var (allCalls, errorCalls) = CountTotalAndErrorRecords();
             var response = new ErrorRateResponse();
             response.Rate = CalculateErrorRate(allCalls, errorCalls);
             response.ColorCondition = GetColorCondition(response.Rate);
             return response;
+        }
+
+        private (int, int) CountTotalAndErrorRecords()
+        {
+            var oldestTimestamp = DateTime.Now.AddHours(-1.0);
+            var allCalls = _dbContext.CallOutcomes.Count(c=>c.Timestamp >= oldestTimestamp);
+            var errorCalls = _dbContext.CallOutcomes.Count(c=>c.Timestamp >= oldestTimestamp && c.IsError);
+            return (allCalls, errorCalls);
         }
 
         private decimal CalculateErrorRate(int allCalls, int errorCalls)
