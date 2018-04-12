@@ -24,46 +24,23 @@ namespace KpiView.Api.Test.Unit
 
         }
 
-        [Fact]
-        public void Return100PercentWhenOnlyOneFailedRecordExists()
-        {
-            ArrangeError();
-
-            var result = _controller.Get();
-
-            Assert.Equal(1.0M, result.Rate);
-        }
-
-        [Fact]
-        public void ReturnZeroWhenOnlyOneSuccessRecordExists()
-        {
-            ArrangeNonError();
-
-            var result = _controller.Get();
-
-            Assert.Equal(0.0M, result.Rate);
-        }
-
-        [Fact]
-        public void ReturnZeroWhenNoRecordsExist()
-        {
-            var result = _controller.Get();
-
-            Assert.Equal(0.0M, result.Rate);
-        }
-
-        [Fact]
-        public void ReturnGreenWhenErrorRateBelow1Percent()
-        {
-            ArrangeError();
-            for (var i = 0; i < 99; i++)
-            {
+        [Theory]
+        [InlineData(0, 0, 0.00)]
+        [InlineData(1, 0, 0.00)]
+        [InlineData(1, 99, 0.99)]
+        [InlineData(99, 1, 0.01)]
+        public void CalculateErrorRateCorrectly(int nonErrors, int errors, decimal expectedErrorRate) 
+        { 
+            for(var i = 0; i < nonErrors; i++) {
                 ArrangeNonError();
             }
-            
+            for(var i = 0; i < errors; i++) {
+                ArrangeError();
+            }
+
             var result = _controller.Get();
 
-            Assert.Equal(0.01M, result.Rate);
+            Assert.Equal(expectedErrorRate, result.Rate);
         }
 
         [Fact]
