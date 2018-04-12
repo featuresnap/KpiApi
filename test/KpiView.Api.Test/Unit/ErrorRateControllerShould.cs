@@ -48,7 +48,7 @@ namespace KpiView.Api.Test.Unit
         [Fact]
         public void NotConsiderRecordsOlderThanOneHour()
         {
-            ArrangeError(record => record.Timestamp = DateTime.Now.AddMinutes(-61.0));
+            ArrangeError(record => record.EndTimestamp = DateTime.Now.AddMinutes(-61.0));
 
             var result = _controller.Get();
 
@@ -107,7 +107,7 @@ namespace KpiView.Api.Test.Unit
 
         private void ArrangeRecord(bool isError, Action<CallOutcome> overrides = null)
         {
-            var callOutcome = new CallOutcome { Id = _nextId++, Timestamp = DateTime.Now.AddSeconds(-1.0), IsError = isError };
+            var callOutcome = new CallOutcome { Id = _nextId++, EndTimestamp = DateTime.Now.AddSeconds(-1.0), IsError = isError };
             if (overrides != null) { overrides(callOutcome); }
             _context.CallOutcomes.Add(callOutcome);
             _context.SaveChanges();

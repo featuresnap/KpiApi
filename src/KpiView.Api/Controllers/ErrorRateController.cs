@@ -31,8 +31,8 @@ namespace KpiView.Api
             try
             {
                 var oldestTimestamp = DateTime.Now.AddHours(-1.0);
-                var allCalls = _dbContext.CallOutcomes.Count(c => c.Timestamp >= oldestTimestamp);
-                var errorCalls = _dbContext.CallOutcomes.Count(c => c.Timestamp >= oldestTimestamp && c.IsError);
+                var allCalls = _dbContext.CallOutcomes.Count(c => c.EndTimestamp >= oldestTimestamp);
+                var errorCalls = _dbContext.CallOutcomes.Count(c => c.EndTimestamp >= oldestTimestamp && c.IsError);
                 return (allCalls, errorCalls);
             }
             catch (Exception exception)

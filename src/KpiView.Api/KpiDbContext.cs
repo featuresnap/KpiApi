@@ -4,15 +4,10 @@ namespace KpiView.Api
 {
     public class KpiDbContext : DbContext
     {
-        protected KpiDbContext() : base()
-        {
-
-        }
-        public KpiDbContext(DbContextOptions<KpiDbContext> options) : base(options)
-        {
-
-        }
+        protected KpiDbContext() : base() { }
+        public KpiDbContext(DbContextOptions<KpiDbContext> options) : base(options) { }
 
         public virtual DbSet<CallOutcome> CallOutcomes { get; set; }
+        public virtual DbSet<CallDuration> CallDurations { get; set; }
     }
 }
