@@ -34,7 +34,8 @@ namespace KpiView.Api.Test
         }
 
         [Fact]
-        public void ReturnCorrectAverageForTwoRecordsOfSameDuration(){
+        public void ReturnCorrectAverageForTwoRecordsOfSameDuration()
+        {
             ArrangeCallTaking(TimeSpan.FromSeconds(1.0));
             ArrangeCallTaking(TimeSpan.FromSeconds(1.0));
             var result = _controller.Get();
@@ -44,7 +45,7 @@ namespace KpiView.Api.Test
         [Fact]
         public void ReturnNullDurationWhenNoRecordsFound()
         {
-            var result =_controller.Get();
+            var result = _controller.Get();
             Assert.Null(result.AverageDurationMilliseconds);
         }
 
@@ -52,12 +53,13 @@ namespace KpiView.Api.Test
         public void IncludeRecordsEndingWithin24Hours()
         {
             var startTime = DateTime.Now.AddHours(-24.1);
-            var endTime =DateTime.Now.AddHours(-23.9);
-            
-            ArrangeCall(c=> {
+            var endTime = DateTime.Now.AddHours(-23.9);
+
+            ArrangeCall(c =>
+            {
                 c.StartTime = startTime;
                 c.EndTime = endTime;
-                c.DurationMilliseconds = (decimal)(endTime - startTime).TotalMilliseconds;
+                c.DurationMilliseconds = (decimal) (endTime - startTime).TotalMilliseconds;
             });
 
             var result = _controller.Get();
@@ -65,16 +67,17 @@ namespace KpiView.Api.Test
             Assert.True(result.AverageDurationMilliseconds > 0.0M);
         }
 
-                [Fact]
+        [Fact]
         public void ExcludeRecordsEndingEarlierThan24HoursAgo()
         {
             var startTime = DateTime.Now.AddHours(-24.2);
-            var endTime =DateTime.Now.AddHours(-24.1);
-            
-            ArrangeCall(c=> {
+            var endTime = DateTime.Now.AddHours(-24.1);
+
+            ArrangeCall(c =>
+            {
                 c.StartTime = startTime;
                 c.EndTime = endTime;
-                c.DurationMilliseconds = (decimal)(endTime - startTime).TotalMilliseconds;
+                c.DurationMilliseconds = (decimal) (endTime - startTime).TotalMilliseconds;
             });
 
             var result = _controller.Get();
@@ -82,22 +85,29 @@ namespace KpiView.Api.Test
             Assert.False(result.AverageDurationMilliseconds > 0.0M);
         }
 
+        [Fact]
+        public void LogWarningWhenNoRecordsFound()
+        {
+            _controller.Get();
+            _logger.Verify(l => l.LogWarning(It.IsAny<string>()));
+        }
 
+        private void ArrangeCall(Action<CallDuration> configuration)
+        {
+            var callDuration = new CallDuration
+            {
+                Id = _nextId++
+            };
+            configuration(callDuration);
+            _dbContext.CallDurations.Add(callDuration);
+            _dbContext.SaveChanges();
 
-private void ArrangeCall(Action<CallDuration> configuration) {
-    var callDuration = new CallDuration {
-        Id = _nextId++
-    };
-    configuration(callDuration);
-    _dbContext.CallDurations.Add(callDuration);
-    _dbContext.SaveChanges();
-
-}
+        }
         private void ArrangeCallTaking(TimeSpan duration)
         {
             var endTime = DateTime.Now.AddMinutes(-1.0);
             var startTime = endTime - duration;
-            ArrangeCall(c=> 
+            ArrangeCall(c =>
             {
                 c.DurationMilliseconds = (decimal) duration.TotalMilliseconds;
                 c.EndTime = DateTime.Now.AddMinutes(-1.0);
