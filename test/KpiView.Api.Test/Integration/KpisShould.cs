@@ -8,10 +8,10 @@ using System.Net;
 
 namespace KpiView.Api.Test.Integration
 {
-    public class KpiApiShould
+    public class KpisShould
     {
         [Fact]
-        public async Task ListKpis()
+        public async Task RespondWithOkHttpStatus()
         {
             var hostBuilder = new WebHostBuilder()
             .UseStartup<Startup>();
