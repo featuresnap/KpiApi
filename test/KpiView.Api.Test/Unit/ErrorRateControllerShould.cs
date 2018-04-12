@@ -29,12 +29,14 @@ namespace KpiView.Api.Test.Unit
         [InlineData(1, 0, 0.00)]
         [InlineData(1, 99, 0.99)]
         [InlineData(99, 1, 0.01)]
-        public void CalculateErrorRateCorrectly(int nonErrors, int errors, decimal expectedErrorRate) 
-        { 
-            for(var i = 0; i < nonErrors; i++) {
+        public void CalculateErrorRateCorrectly(int nonErrors, int errors, decimal expectedErrorRate)
+        {
+            for (var i = 0; i < nonErrors; i++)
+            {
                 ArrangeNonError();
             }
-            for(var i = 0; i < errors; i++) {
+            for (var i = 0; i < errors; i++)
+            {
                 ArrangeError();
             }
 
@@ -42,6 +44,29 @@ namespace KpiView.Api.Test.Unit
 
             Assert.Equal(expectedErrorRate, result.Rate);
         }
+
+        [Theory]
+        [InlineData(0, 0, ColorCondition.GREEN)]
+        [InlineData(99, 1, ColorCondition.GREEN)]
+        [InlineData(98, 2, ColorCondition.YELLOW)]
+        [InlineData(95, 5, ColorCondition.YELLOW)]
+        [InlineData(94, 6, ColorCondition.RED)]
+        public void AssignColorBasedOnErrorRate(int nonErrors, int errors, string expectedColor)
+        {
+            for (var i = 0; i < nonErrors; i++)
+            {
+                ArrangeNonError();
+            }
+            for (var i = 0; i < errors; i++)
+            {
+                ArrangeError();
+            }
+
+            var result = _controller.Get();
+
+            Assert.Equal(expectedColor, result.ColorCondition);
+        }
+
 
         [Fact]
         public void LogWarningWhenNoRecordsExist()

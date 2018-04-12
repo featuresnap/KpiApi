@@ -1,6 +1,6 @@
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using KpiView.Api.Logging;
+using Microsoft.AspNetCore.Mvc;
 
 namespace KpiView.Api
 {
@@ -16,20 +16,32 @@ namespace KpiView.Api
             _logger = logger;
         }
 
-        public ErrorRate Get()
+        public ErrorRateResponse Get()
         {
-            decimal allCalls = _dbContext.CallOutcomes.Count();
-            decimal errorCalls = _dbContext.CallOutcomes.Count(co => co.IsError);
-            var result = new ErrorRate();
-            if (allCalls != 0)
-            {
-                result.Rate = errorCalls / allCalls;
-            }
-            else
+            var allCalls = _dbContext.CallOutcomes.Count();
+            var errorCalls = _dbContext.CallOutcomes.Count(co => co.IsError);
+            var response = new ErrorRateResponse();
+            response.Rate = CalculateErrorRate(allCalls, errorCalls);
+            response.ColorCondition = GetColorCondition(response.Rate);
+            return response;
+        }
+
+        private decimal CalculateErrorRate(int allCalls, int errorCalls)
+        {
+            if (allCalls == 0)
             {
                 _logger.LogWarning("No calls available for error rate computation");
+                return 0.0M;
             }
-            return result;
+            return (decimal)errorCalls / (decimal)allCalls;
         }
+
+        private string GetColorCondition(decimal errorRate)
+        {
+            if (errorRate <= 0.01M) { return ColorCondition.GREEN; }
+            if (errorRate <= 0.05M) { return ColorCondition.YELLOW; }
+            return ColorCondition.RED;
+        }
+
     }
 }
