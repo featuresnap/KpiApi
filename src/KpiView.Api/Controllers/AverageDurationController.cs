@@ -19,11 +19,15 @@ namespace KpiView.Api
 
         public AverageDurationResponse Get()
         {
-            var records = _dbContext.CallDurations.Count();
+            var oldestEndTime = DateTime.Now.AddHours(-24.0);
+            var records = _dbContext.CallDurations.Count(c=>c.EndTime >= oldestEndTime);
             var response = new AverageDurationResponse();
             decimal? averageDuration = null;
             if (records > 0) {
-                averageDuration = _dbContext.CallDurations.Select(x=>x.DurationMilliseconds).Average();
+                averageDuration = _dbContext.CallDurations
+                .Where(c=>c.EndTime >= oldestEndTime)
+                .Select(x=>x.DurationMilliseconds)
+                .Average();
             }
         
             return new AverageDurationResponse{AverageDurationMilliseconds = averageDuration};

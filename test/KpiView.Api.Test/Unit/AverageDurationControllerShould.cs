@@ -48,21 +48,61 @@ namespace KpiView.Api.Test
             Assert.Null(result.AverageDurationMilliseconds);
         }
 
+        [Fact]
+        public void IncludeRecordsEndingWithin24Hours()
+        {
+            var startTime = DateTime.Now.AddHours(-24.1);
+            var endTime =DateTime.Now.AddHours(-23.9);
+            
+            ArrangeCall(c=> {
+                c.StartTime = startTime;
+                c.EndTime = endTime;
+                c.DurationMilliseconds = (decimal)(endTime - startTime).TotalMilliseconds;
+            });
 
-        private void ArrangeCallTaking(TimeSpan duration, Action<CallDuration> extraConfiguration = null)
+            var result = _controller.Get();
+
+            Assert.True(result.AverageDurationMilliseconds > 0.0M);
+        }
+
+                [Fact]
+        public void ExcludeRecordsEndingEarlierThan24HoursAgo()
+        {
+            var startTime = DateTime.Now.AddHours(-24.2);
+            var endTime =DateTime.Now.AddHours(-24.1);
+            
+            ArrangeCall(c=> {
+                c.StartTime = startTime;
+                c.EndTime = endTime;
+                c.DurationMilliseconds = (decimal)(endTime - startTime).TotalMilliseconds;
+            });
+
+            var result = _controller.Get();
+
+            Assert.False(result.AverageDurationMilliseconds > 0.0M);
+        }
+
+
+
+private void ArrangeCall(Action<CallDuration> configuration) {
+    var callDuration = new CallDuration {
+        Id = _nextId++
+    };
+    configuration(callDuration);
+    _dbContext.CallDurations.Add(callDuration);
+    _dbContext.SaveChanges();
+
+}
+        private void ArrangeCallTaking(TimeSpan duration)
         {
             var endTime = DateTime.Now.AddMinutes(-1.0);
             var startTime = endTime - duration;
-            var callDuration = new CallDuration
+            ArrangeCall(c=> 
             {
-                Id = _nextId++,
-                DurationMilliseconds = (decimal) duration.TotalMilliseconds,
-                EndTime = DateTime.Now.AddMinutes(-1.0),
-                StartTime = startTime
-            };
-            if (extraConfiguration != null) { extraConfiguration(callDuration); }
-            _dbContext.CallDurations.Add(callDuration);
-            _dbContext.SaveChanges();
+                c.DurationMilliseconds = (decimal) duration.TotalMilliseconds;
+                c.EndTime = DateTime.Now.AddMinutes(-1.0);
+                c.StartTime = startTime;
+            });
         }
     }
 }
